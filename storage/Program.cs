@@ -234,25 +234,56 @@ namespace container
     {
         static void Main(string[] args)
         {
-            Container<Vector> container = new Container<Vector>(5);
-            for(int i = 0; i < 10; i++)
+            Vector CreateRandomVector()
             {
                 Random rnd = new Random();
                 if (rnd.NextDouble() >= 0.5)
                 {
-                    container.Append(new Vector2D(
+                    return new Vector2D(
                         rnd.NextDouble() * 20 - 10,
-                        rnd.NextDouble() * 20 - 10));
+                        rnd.NextDouble() * 20 - 10);
                 }
                 else
                 {
-                    container.Append(new Vector3D(
+                    return new Vector3D(
                         rnd.NextDouble() * 20 - 10,
                         rnd.NextDouble() * 20 - 10,
-                        rnd.NextDouble() * 20 - 10));
+                        rnd.NextDouble() * 20 - 10);
                 }
             }
+
+            Container<Vector> container = new Container<Vector>(5);
             Console.WriteLine();
+            for(int i = 0; i < 10; i++)
+            {
+                container.Append(CreateRandomVector());
+                Console.WriteLine();
+            }
+            Console.WriteLine("=======================================");
+
+            for (container.First(); container.IsEOL() == false; container.Next())
+            {
+                if (container != null)
+                {
+                    Random rnd = new Random();
+                    int nextRandNum = rnd.Next(4);
+                    if (nextRandNum == 0)
+                    {
+                        container.Append(CreateRandomVector());
+                    }
+                    else if (nextRandNum == 1)
+                    {
+                        container.Insert(CreateRandomVector());
+                    }
+                    else
+                    {
+                        container.DeleteCurrent();
+                    }
+                    Console.WriteLine();
+                }
+            }
+            Console.WriteLine("=======================================");
+
             for (container.First(); container.IsEOL() == false; container.Next())
             {
                 if (container != null)
