@@ -14,8 +14,7 @@ namespace container
             Console.WriteLine("Debug: Vector - destructor");
         }
         public abstract void PrintVectorDescription();
-        public abstract double GetLengh();
-        public abstract double GetAngleWithUnitVector();
+        public abstract double GetLenth();
         public abstract double GetComponentSum();
 
     }
@@ -60,21 +59,14 @@ namespace container
 
         public override void PrintVectorDescription()
         {
-            Console.Write($"({X}, {Y})");
             Console.WriteLine("Debug: Vector2D.PrintVectorDescription()");
+            Console.Write($"({String.Format("{0:0.00}", X)}, {String.Format("{0:0.00}", Y)})\n");
         }
 
-        public override double GetLengh()
+        public override double GetLenth()
         {
-            Console.WriteLine("Debug: Vector2D.GetLengh()");
+            Console.WriteLine("Debug: Vector2D.GetLenth()");
             return (double)Math.Sqrt(X * X + Y * Y);
-        }
-
-        public override double GetAngleWithUnitVector()
-        {
-            Console.WriteLine("Debug: Vector2D.GetAngleWithUnitVector()");
-            double lengh = GetLengh();
-            return Math.Acos(X/lengh + Y/lengh);
         }
 
         public override double GetComponentSum()
@@ -132,21 +124,14 @@ namespace container
 
         public override void PrintVectorDescription()
         {
-            Console.Write($"({X}, {Y}, {Z})");
             Console.WriteLine("Debug: Vector3D.PrintVectorDescription()");
+            Console.Write($"({String.Format("{0:0.00}", X)}, {String.Format("{0:0.00}", Y)}, {String.Format("{0:0.00}", Z)})\n");
         }
 
-        public override double GetLengh()
+        public override double GetLenth()
         {
-            Console.WriteLine("Debug: Vector3D.GetLengh()");
+            Console.WriteLine("Debug: Vector3D.GetLenth()");
             return (double)Math.Sqrt(X * X + Y * Y + Z * Z);
-        }
-
-        public override double GetAngleWithUnitVector()
-        {
-            Console.WriteLine("Debug: Vector3D.GetAngleWithUnitVector()");
-            double lengh = GetLengh();
-            return Math.Acos(X / lengh + Y / lengh + Z / lengh);
         }
 
         public override double GetComponentSum()
@@ -155,10 +140,11 @@ namespace container
             return X + Y + Z;
         }
     }
-    public class Container<T>
+    public class Container<T> where T : class
     {
-        private T[] elements;
-        private int curEl;
+        private T[] elements; 
+        private int curElIndex;
+        private int lastElIndex = -1;
 
         public Container(int size)
         {
@@ -174,40 +160,70 @@ namespace container
         {
             Console.WriteLine("Debug: Container - destructor");
         }
-        public bool Add(T element)
+        public void Append(T element)
         {
-            Console.WriteLine("Debug: Container.Add()");
+            Console.WriteLine("Debug: Container.Append()");
 
-            int i = 0;
-            for(; elements[i] != null; i++)
+            if (lastElIndex == elements.Length - 1)
             {
-                if(i >= elements.Length)
-                {
-                    return false;
-                }
+                ExpandArrayAndCopyContents();
             }
-            elements[i] = element;
-            return true;
+            elements[lastElIndex + 1] = element;
+            lastElIndex += 1;
+        }
+        public void Insert(T element)
+        {
+            Console.WriteLine("Debug: Container.Insert()");
+
+            if (lastElIndex == elements.Length - 1)
+            {
+                ExpandArrayAndCopyContents();
+            }
+            for (int i = lastElIndex; i > curElIndex; i--)
+            {
+                elements[i + 1] = elements[i];
+            }
+            elements[curElIndex] = element;
+            lastElIndex += 1;
+        }
+        private void ExpandArrayAndCopyContents()
+        {
+            T[] newArrayExpanded = new T[elements.Length * 2];
+            for (int i = 0; i < elements.Length; i++)
+            {
+                newArrayExpanded[i] = elements[i];
+            }
+            elements = newArrayExpanded;
+        }
+        public void DeleteCurrent()
+        {
+            Console.WriteLine("Debug: Container.DeleteCurrent()");
+            for (int i = curElIndex; i < lastElIndex; i++)
+            {
+                elements[i] = elements[i + 1];
+            }
+            elements[lastElIndex] = null;
+            lastElIndex -= 1;
         }
         public void First()
         {
             Console.WriteLine("Debug: Container.First()");
-            curEl = 0;
+            curElIndex = 0;
         }
         public void Next()
         {
             Console.WriteLine("Debug: Container.Next()");
-            curEl += 1;
+            curElIndex += 1;
         }
         public T GetCurrent()
         {
             Console.WriteLine("Debug: Container.GetCurrent()");
-            return elements[curEl];
+            return elements[curElIndex];
         }
         public bool IsEOL()
         {
             Console.WriteLine("Debug: Container.IsEOL()");
-            if (curEl >= elements.Length)
+            if (curElIndex > lastElIndex)
                 return true;
 
             return false;
@@ -218,24 +234,25 @@ namespace container
     {
         static void Main(string[] args)
         {
-            Container<Vector> container = new Container<Vector>(10);
+            Container<Vector> container = new Container<Vector>(5);
             for(int i = 0; i < 10; i++)
             {
                 Random rnd = new Random();
                 if (rnd.NextDouble() >= 0.5)
                 {
-                    container.Add(new Vector2D(
+                    container.Append(new Vector2D(
                         rnd.NextDouble() * 20 - 10,
                         rnd.NextDouble() * 20 - 10));
                 }
                 else
                 {
-                    container.Add(new Vector3D(
+                    container.Append(new Vector3D(
                         rnd.NextDouble() * 20 - 10,
                         rnd.NextDouble() * 20 - 10,
                         rnd.NextDouble() * 20 - 10));
                 }
             }
+
         }
     }
 }
