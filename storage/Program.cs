@@ -257,12 +257,14 @@ namespace container
             Console.WriteLine($"Total length of vectors in container: {String.Format("{0:0.00}", totalLength)}\n");
 
 
-            var watch = new System.Diagnostics.Stopwatch();
-            watch.Start();
-
             const int vectorCount = 100;
             const int operationCount = 10000;
-            Console.WriteLine($"==== {operationCount} operations on {vectorCount} vectors ====");
+            Console.WriteLine($"{operationCount} operations on {vectorCount} vectors:");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
             for (int i = 0; i < operationCount; i++)
             {
                 container.Append(CreateRandomVector());
