@@ -146,10 +146,10 @@ namespace container
         private int curElIndex;
         private int lastElIndex = -1;
 
-        public Container(int size)
+        public Container()
         {
-            Console.WriteLine("Debug: Container - constructor with parameters");
-            elements = new T[size];
+            Console.WriteLine("Debug: Container - default constructor");
+            elements = new T[0];
         }
         public Container(Container<T> container)
         {
@@ -179,7 +179,7 @@ namespace container
             {
                 ExpandArrayAndCopyContents();
             }
-            for (int i = lastElIndex; i > curElIndex; i--)
+            for (int i = lastElIndex; i >= curElIndex; i--)
             {
                 elements[i + 1] = elements[i];
             }
@@ -188,7 +188,7 @@ namespace container
         }
         private void ExpandArrayAndCopyContents()
         {
-            T[] newArrayExpanded = new T[elements.Length * 2];
+            T[] newArrayExpanded = new T[elements.Length + 10]; // Probably not smart
             for (int i = 0; i < elements.Length; i++)
             {
                 newArrayExpanded[i] = elements[i];
@@ -198,12 +198,16 @@ namespace container
         public void DeleteCurrent()
         {
             Console.WriteLine("Debug: Container.DeleteCurrent()");
-            for (int i = curElIndex; i < lastElIndex; i++)
+            if(elements.Length != 0)
             {
-                elements[i] = elements[i + 1];
+                for (int i = curElIndex; i < lastElIndex; i++)
+                {
+                    elements[i] = elements[i + 1];
+                }
+                elements[lastElIndex] = null;
+                lastElIndex -= 1;
             }
-            elements[lastElIndex] = null;
-            lastElIndex -= 1;
+
         }
         public void First()
         {
@@ -234,6 +238,82 @@ namespace container
     {
         static void Main(string[] args)
         {
+            Container<Vector> container = new Container<Vector>();
+            container.Append(new Vector3D(1, 4, -2));
+            container.Append(new Vector2D(-3, 2));
+            container.Append(new Vector3D(0, 1, -2));
+
+            container.First();
+            container.DeleteCurrent();
+            container.Next();
+            container.Insert(new Vector2D(2, -1));
+
+            Console.WriteLine();
+            double totalLength = 0;
+            for(container.First(); container.IsEOL() == false; container.Next())
+            {
+                totalLength += container.GetCurrent().GetLenth();
+            }
+            Console.WriteLine($"Total length of vectors in container: {String.Format("{0:0.00}", totalLength)}\n");
+
+
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+
+            const int vectorCount = 100;
+            const int operationCount = 10000;
+            Console.WriteLine($"==== {operationCount} operations on {vectorCount} vectors ====");
+            for (int i = 0; i < operationCount; i++)
+            {
+                container.Append(CreateRandomVector());
+                Console.WriteLine();
+            }
+            container.First();
+            for (int i = 0; i < operationCount; i++) 
+            {
+                if (container.IsEOL())
+                {
+                    container.First();
+                }
+
+                if (container != null)
+                {
+                    Random rnd = new Random();
+                    int nextRandNum = rnd.Next(6);
+                    if (nextRandNum == 0)
+                    {
+                        Vector curEl = container.GetCurrent();
+                        curEl.PrintVectorDescription();
+                        double length = curEl.GetLenth();
+                        Console.WriteLine($"Lenth: {String.Format("{0:0.00}", length)}\n");
+                    }
+                    else if (nextRandNum == 1)
+                    {
+                        Vector curEl = container.GetCurrent();
+                        curEl.PrintVectorDescription();
+                        double sum = curEl.GetComponentSum();
+                        Console.WriteLine($"Sum: {String.Format("{0:0.00}", sum)}\n");
+                    }
+                    else if (nextRandNum == 2)
+                    {
+                        container.Append(CreateRandomVector());
+                    }
+                    else if (nextRandNum == 3)
+                    {
+                        container.Insert(CreateRandomVector());
+                    }
+                    else
+                    {
+                        container.DeleteCurrent();
+                    }
+                    Console.WriteLine();
+                }
+                container.Next();
+            }
+            watch.Stop();
+
+            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms for {operationCount} operations");
+
             Vector CreateRandomVector()
             {
                 Random rnd = new Random();
@@ -249,60 +329,6 @@ namespace container
                         rnd.NextDouble() * 20 - 10,
                         rnd.NextDouble() * 20 - 10,
                         rnd.NextDouble() * 20 - 10);
-                }
-            }
-
-            Container<Vector> container = new Container<Vector>(5);
-            Console.WriteLine();
-            for(int i = 0; i < 10; i++)
-            {
-                container.Append(CreateRandomVector());
-                Console.WriteLine();
-            }
-            Console.WriteLine("=======================================");
-
-            for (container.First(); container.IsEOL() == false; container.Next())
-            {
-                if (container != null)
-                {
-                    Random rnd = new Random();
-                    int nextRandNum = rnd.Next(4);
-                    if (nextRandNum == 0)
-                    {
-                        container.Append(CreateRandomVector());
-                    }
-                    else if (nextRandNum == 1)
-                    {
-                        container.Insert(CreateRandomVector());
-                    }
-                    else
-                    {
-                        container.DeleteCurrent();
-                    }
-                    Console.WriteLine();
-                }
-            }
-            Console.WriteLine("=======================================");
-
-            for (container.First(); container.IsEOL() == false; container.Next())
-            {
-                if (container != null)
-                {
-                    Vector curEl = container.GetCurrent();
-                    curEl.PrintVectorDescription();
-
-                    Random rnd = new Random();
-                    int nextRandNum = rnd.Next(2);
-                    if (nextRandNum == 0)
-                    {
-                        double length = curEl.GetLenth();
-                        Console.WriteLine($"Lenth: {String.Format("{0:0.00}", length)}\n");
-                    }
-                    else
-                    {
-                        double sum = curEl.GetComponentSum();
-                        Console.WriteLine($"Sum: {String.Format("{0:0.00}", sum)}\n");
-                    }
                 }
             }
         }
