@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace container
 {
@@ -161,36 +162,47 @@ namespace container
 
         Container()
         {
+            Console.WriteLine("Debug: Container - defualt constructor\n");
             elements = new List<T>();
         }
         Container(List<T> list)
         {
+            Console.WriteLine("Debug: Container - constructor with parameters\n");
             elements = list;
         }
         Container(Container<T> container)
         {
+            Console.WriteLine("Debug: Container - copy constructor\n");
             this.elements = container.elements;
         }
         ~Container()
         {
-
+            Console.WriteLine("Debug: Container - destructor\n");
         }
-
+        public void Append(T element)
+        {
+            Console.WriteLine("Debug: Container.Append()\n");
+            elements.Add(element);
+        }
         public void First()
         {
+            Console.WriteLine("Debug: Container.First()\n");
             curEl = 0;
         }
         public void Next()
         {
+            Console.WriteLine("Debug: Container.Next()\n");
             curEl += 1;
         }
         public T GetCurrent()
         {
+            Console.WriteLine("Debug: Container.GetCurrent()\n");
             return elements[curEl];
         }
         public bool IsEOL()
         {
-            if(curEl >= elements.Count)
+            Console.WriteLine("Debug: Container.IsEOL()\n");
+            if (curEl >= elements.Count)
                 return true;
 
             return false;
