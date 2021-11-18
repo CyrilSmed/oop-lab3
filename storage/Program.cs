@@ -252,7 +252,28 @@ namespace container
                         rnd.NextDouble() * 20 - 10));
                 }
             }
+            Console.WriteLine();
+            for (container.First(); container.IsEOL() == false; container.Next())
+            {
+                if (container != null)
+                {
+                    Vector curEl = container.GetCurrent();
+                    curEl.PrintVectorDescription();
 
+                    Random rnd = new Random();
+                    int nextRandNum = rnd.Next(2);
+                    if (nextRandNum == 0)
+                    {
+                        double length = curEl.GetLenth();
+                        Console.WriteLine($"Lenth: {String.Format("{0:0.00}", length)}\n");
+                    }
+                    else
+                    {
+                        double sum = curEl.GetComponentSum();
+                        Console.WriteLine($"Sum: {String.Format("{0:0.00}", sum)}\n");
+                    }
+                }
+            }
         }
     }
 }
